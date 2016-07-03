@@ -1,0 +1,35 @@
+<section class="panel">
+	<header class="panel-heading custom-tab turquoise-tab">
+		<ul class="nav nav-tabs">
+			<li>
+				<a data-toggle="tab" href="#formsLayouts">Forms Layouts</a>
+			</li>
+			<li>
+				<a data-toggle="tab" href="#advancedComponents">Advanced Components</a>
+			</li>
+			<li>
+				<a data-toggle="tab" href="#aynamicTable">Dynamic Table</a>
+			</li>
+			<li class="active">
+				<a data-toggle="tab" href="#pickers">Pickers</a>
+			</li>
+		</ul>
+	</header>
+	<div class="panel-body bg-color-main">
+		<div class="tab-content">
+			<div id="formsLayouts" class="tab-pane">{{> demo/forms-layouts}}</div>
+			<div id="advancedComponents" class="tab-pane">{{> demo/advanced-components}}</div>
+			<div id="aynamicTable" class="tab-pane">{{> demo/aynamic-table}}</div>
+			<div id="pickers" class="tab-pane active">{{> demo/pickers}}</div>
+		</div>
+	</div>
+</section>
+
+
+{{#section 'css'}}
+
+{{/section}}
+
+{{#section 'js'}}
+<script src="/js/forms.js"></script>
+{{/section}}

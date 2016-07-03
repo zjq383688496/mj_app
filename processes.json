@@ -1,0 +1,12 @@
+{
+  "apps": [{
+    "name": "mengju.weimob.com",
+    "script": "bin/www",
+    "watch": true,
+    "ignoreWatch": ["node_modules","public","views"],
+    "log_date_format": "YYYY-MM-DD HH:mm Z",
+    "env": {
+      "NODE_ENV": "production"
+    }
+  }]
+}

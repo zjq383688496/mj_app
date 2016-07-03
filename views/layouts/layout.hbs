@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html style="overflow: hidden;">
+<head>
+	{{> globel/head}}
+	{{{_sections.css}}}
+</head>
+<body class="horizontal-menu-page">
+	<section>
+		{{!-- header section start --}}
+		{{> globel/header-full}}
+		{{!-- header section end --}}
+
+		{{!-- body wrapper start --}}
+		<div id="wrapper" class="wrapper">
+			{{{body}}}
+		</div>
+		{{!-- body wrapper end --}}
+
+		{{!-- footer section start --}}
+		{{> globel/footer-full}}
+		{{!-- footer section end --}}
+	</section>
+	{{> globel/script}}
+	{{{_sections.js}}}
+</body>
+</html>
