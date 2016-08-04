@@ -2,19 +2,19 @@
 
 var oneapm;
 if (!process.env.localhost) oneapm = require('oneapm');
-var express      = require('express');
-var path         = require('path');
-var logger       = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser   = require('body-parser');
-var config       = require('./config');
-var routes       = require('./config.routes');
-var handlebars   = require('express3-handlebars');
-var session      = require('express-session');
+const express      = require('express');
+const path         = require('path');
+const logger       = require('morgan');
+const cookieParser = require('cookie-parser');
+const bodyParser   = require('body-parser');
+const config       = require('./config');
+const routes       = require('./config.routes');
+const handlebars   = require('express3-handlebars');
+const session      = require('express-session');
 
 // 创建项目实例
-var app = express();
-var _   = require('lodash');
+const app = express();
+const _   = require('lodash');
 
 app.disable('x-powered-by');
 
@@ -36,7 +36,7 @@ var hbs = handlebars.create({
 });
 app.engine('hbs', hbs.engine);
 app.set('view engine', 'hbs');
-app.set('views', path.join(__dirname + config.views.views));	// 设置views目录
+app.set('views', config.views.views);	// 设置views目录
 app.set('config', config);
 
 _.extend(app.locals, {
@@ -46,7 +46,7 @@ _.extend(app.locals, {
 // app.locals.selectnav = 'index';
 
 // 定义日志和输出级别
-//app.use(logger(config.debug ? 'dev' : 'combined'));
+// app.use(logger(config.debug ? 'dev' : 'combined'));
 
 app.use(session({
 	secret: 'mengju.weimob.com.secret',
@@ -60,9 +60,9 @@ app.use(session({
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(cookieParser());
+app.use(cookieParser(config.cookieSecret));
 
-var oneDay = 86400000;
+const oneDay = 86400000;
 app.use(express.static(__dirname + config.staticPath, {
 	maxAge: oneDay
 }));

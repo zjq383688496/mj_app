@@ -1,46 +1,55 @@
 var path      = require('path'),
 	rootPath  = path.normalize(__dirname + '/..'),
-	env       = process.env.NODE_ENV || 'development',
-	localhost = process.env.localhost || 'false';
+	env       = process.env.NODE_ENV || 'localhost';
 var config = {
 	// 本地环境
 	localhost: {
 		root: rootPath,
 		site_absolutepath: '/',
 		domain: '',
-		mengjuApi: 'http://121.40.18.85:8080/mjad',
+		mjApi: 'http://121.40.18.85:8080/mjad',
+		//mjApi: 'http://localhost:8080/mjad',
 		staticPath: '/public',
 		views: {
-			views: '/views',
+			views: 'views',
 			layouts:  'views/layouts/',
 			partials: 'views/partials/'
 		},
 		link: {
-			login: 'http://passport.test.weimob.com/index/login'
-		}
+			index: 'http://localhost:3000/app',
+			login: 'http://localhost:3000',
+			logout: 'http://localhost:3000/logout',
+			logoutWeimob: 'http://passport.test.weimob.com/index/loginout'
+		},
+		cookieSecret: (new Buffer('localhost:4010')).toString('base64')
 	},
 	// DEV环境
 	development: {
 		root: rootPath,
 		site_absolutepath: '/',
-		domain: '.www.dev.weimob.com',
-		mengjuApi: 'http://121.40.18.85:8080/mjad',
+		domain: 'dev.weimob.com',
+		mjApi: 'http://121.40.18.85:8080/mjad',
 		staticPath: '/public/build',
 		views: {
-			views: '/views/build',
+			views: 'views/build',
 			layouts:  'views/build/layouts/',
 			partials: 'views/build/partials/'
 		},
 		link: {
-			login: 'http://passport.test.weimob.com/index/login'
-		}
+			index: 'http://app.mj.dev.weimob.com/app',
+			login: 'http://app.mj.dev.weimob.com',
+			logout: 'http://app.mj.dev.weimob.com/logout',
+			logoutWeimob: 'http://passport.test.weimob.com/index/loginout'
+		},
+		cookieSecret: (new Buffer('mj.dev.weimob.com')).toString('base64')
 	},
 	// PRD环境
 	production: {
 		root: rootPath,
 		site_absolutepath: '/',
 		domain: 'weimob.com',
-		mengjuApi: 'http://10.51.14.53:8080/mjad',
+		mjApiIP: '10.51.14.53',
+		mjApi: 'http://10.51.14.53:8080/mjad',
 		staticPath: '/public/build',
 		views: {
 			views: '/views/build',
@@ -48,22 +57,21 @@ var config = {
 			partials: 'views/build/partials/'
 		},
 		link: {
-			login: 'http://passport.test.weimob.com/index/login'
-		}
+			index: 'http://app.mj.weimob.com/app',
+			login: 'http://app.mj.weimob.com',
+			logout: 'http://app.mj.weimob.com/logout',
+			logoutWeimob: 'http://passport.weimob.com/index/loginout'
+		},
+		cookieSecret: (new Buffer('mj.weimob.com')).toString('base64')
 	}
 };
 
-var online = (localhost == 'false'),
-	currentConfig = config[online? env: 'localhost'];
+var currentConfig = config[env];
 
-//console.log(online? env: 'localhost');
 module.exports = currentConfig;
-module.exports.evn = (online? env: 'localhost');
-module.exports.noLocal = ((online? env: 'localhost') != 'localhost');
-module.exports.debug = (env == 'development');
-module.exports.online = online;
+module.exports.evn = env;
+module.exports.noLocal = (env != 'localhost');
 module.exports.title = '微盟盟聚—移动社交广告一站式投放平台';
-module.exports.description = '盟聚(上海盟聚信息科技有限公司),是微盟旗下全资子公司,依托微盟公司多年来微信营销经验，为客户提供包括微信朋友圈广告，微信MP广告（微信公众号广告）和广点通三大社交广告的投放服务,并向客户提供包括微信行业营销解决方案，以及素材制作账号优化和数据分析在内的增值服务。';
 module.exports.keywords = '微盟,盟聚,微盟盟聚,朋友圈广告,微信公众号广告,微信MP广告,广点通,移动社交广告';
 /*module.exports.app = {
 	site_name: "weimob",

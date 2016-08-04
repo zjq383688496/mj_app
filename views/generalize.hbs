@@ -1,0 +1,167 @@
+{{!-- <h1>Hello World!</h1> --}}
+<div class="row">
+	<div class="col-md-12 state-block">
+		<div class="panel primary">
+			<div class="btn-group btn-group-justified">
+				<a class="btn btn-info">Left</a>
+				<a class="btn btn-info">Middle</a>
+				<a class="btn btn-info">Right</a>
+				<a class="btn">Right</a>
+			</div>
+		</div>
+	</div>
+</div>
+<hr>
+
+<!-- page heading start-->
+<h3>投放数据</h3>
+<!-- page heading end-->
+
+<div class="row">
+	<div class="col-md-12">
+		<section class="panel">
+			<header class="panel-heading">
+				整体情况
+				&nbsp;&nbsp;
+				<a class="text-muted">查看详情</a>
+				&nbsp;&nbsp;
+				<span class="tools pull-right">
+					<a href="javascript:;" class="fa fa-chevron-up"></a>
+					<a href="javascript:;" class="fa fa-times"></a>
+				</span>
+				<small class="text-muted">(过去7天数据)</small>
+			</header>
+			<div class="panel-body">
+				<div class="row">
+					<div class="col-md-2 state-overview-s">
+						<div class="panel primary">
+							<small>曝光量 (次)</small>
+							<div class="value">230</div>
+						</div>
+					</div>
+					<div class="col-md-2 state-overview-s">
+						<div class="panel yellow">
+							<small>点击量 (次)</small>
+							<div class="value">230</div>
+						</div>
+					</div>
+					<div class="col-md-2 state-overview-s">
+						<div class="panel light">
+							<small>平均点击率</small>
+							<div class="value">230</div>
+						</div>
+					</div>
+					<div class="col-md-2 state-overview-s">
+						<div class="panel red">
+							<small>花费 (元)</small>
+							<div class="value">230</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-2">
+						<select id="deliverySelect1" class="form-control m-bot15"></select>
+					</div>
+					<div class="col-md-8"></div>
+					<div class="col-md-2">
+						<select id="deliverySelect2" class="form-control m-bot15">
+						</select>
+					</div>
+				</div>
+				<div id="delivery-chart">
+					<div id="delivery-container" style="width: 100%;height:300px; text-align: center; margin:0 auto;">
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-12">
+		<section class="panel">
+			<header class="panel-heading">
+				受众分布
+				<a class="tooltips" data-toggle="tooltip" data-placement="right" title="" data-original-title="根据每日投放数据，从年龄、性别和地域三个纬度汇总受众人群信息"><i class="fa fa-question-circle"></i></a>
+				<span class="tools pull-right">
+					<a href="javascript:;" class="fa fa-chevron-up"></a>
+					<a href="javascript:;" class="fa fa-times"></a>
+				</span>
+			</header>
+			<div class="panel-body">
+				<div class="col-md-5">
+					<div class="row">
+						<div class="col-md-12">
+							<div id="age-chart">
+								<div id="age-container" style="width: 100%;height:250px; text-align: center; margin:0 auto;">
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-12">
+							<div id="gender-chart">
+								<div id="gender-container" style="width: 100%;height:250px; text-align: center; margin:0 auto;">
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-7">
+					<div class="row">
+						<div id="map-chart">
+							<div id="map-container" style="width: 100%;height:500px; text-align: center; margin:0 auto;">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-12">
+		<section class="panel">
+			<header class="panel-heading">
+				广告组列表
+				<span class="tools pull-right">
+					<a href="javascript:;" class="fa fa-chevron-up"></a>
+					<a href="javascript:;" class="fa fa-times"></a>
+				</span>
+			</header>
+			<div class="panel-body">
+				<div class="adv-table">
+					<table class="display table table-bordered table-striped" id="adv-list">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>广告组名称</th>
+								<th>位置</th>
+								<th>素材样式</th>
+								<th>出价</th>
+								{{!-- <th>上线时间</th>
+								<th>审核状态</th>
+								<th>投放状态</th>
+								<th>备注</th>
+								<th>操作</th> --}}
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</section>
+	</div>
+</div>
+
+{{#section 'css'}}
+
+{{/section}}
+
+{{#section 'headerSub'}}
+
+{{/section}}
+
+{{#section 'js'}}
+<script src="/js/index.js"></script>
+{{/section}}

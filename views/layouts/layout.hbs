@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html style="overflow: hidden;">
+<html>
 <head>
 	{{> globel/head}}
 	{{{_sections.css}}}
@@ -9,6 +9,10 @@
 		{{!-- header section start --}}
 		{{> globel/header-full}}
 		{{!-- header section end --}}
+
+		{{!-- header-sub section start --}}
+		{{{_sections.headerSub}}}
+		{{!-- header-sub section end --}}
 
 		{{!-- body wrapper start --}}
 		<div id="wrapper" class="wrapper">
@@ -21,6 +25,10 @@
 		{{!-- footer section end --}}
 	</section>
 	{{> globel/script}}
+	<script>
+	var _USER_ = '{{{config.userStr}}}';
+	_USER_ = MJJS.json.parse(_USER_);
+	</script>
 	{{{_sections.js}}}
 </body>
 </html>

@@ -2473,7 +2473,7 @@
 	 */
 	function _fnGetCellData( settings, rowIdx, colIdx, type )
 	{
-		var draw           = settings.iDraw;
+		//var draw           = settings.iDraw;
 		var col            = settings.aoColumns[colIdx];
 		var rowData        = settings.aoData[rowIdx]._aData;
 		var defaultContent = col.sDefaultContent;
@@ -2484,11 +2484,12 @@
 		} );
 	
 		if ( cellData === undefined ) {
-			if ( settings.iDrawError != draw && defaultContent === null ) {
+			//if ( settings.iDrawError != draw && defaultContent === null ) {
+			if ( defaultContent === null ) {
 				_fnLog( settings, 0, "Requested unknown parameter "+
 					(typeof col.mData=='function' ? '{function}' : "'"+col.mData+"'")+
 					" for row "+rowIdx+", column "+colIdx, 4 );
-				settings.iDrawError = draw;
+				//settings.iDrawError = draw;
 			}
 			return defaultContent;
 		}
@@ -3867,13 +3868,11 @@
 		var baseAjax = {
 			"data": data,
 			"success": function (json) {
-				var error = json.error || json.sError;
-				if ( error ) {
-					_fnLog( oSettings, 0, error );
+				if (json.code !== '0000') {
+					_fnLog( oSettings, 0, json.message );
 				}
-	
-				oSettings.json = json;
-				callback( json );
+				oSettings.json = json.data;
+				callback( json.data );
 			},
 			"dataType": "json",
 			"cache": false,
@@ -4000,7 +3999,7 @@
 	
 		// DataTables 1.10+ method
 		var d = {
-			draw:    settings.iDraw,
+			//draw:    settings.iDraw,
 			columns: [],
 			order:   [],
 			start:   displayStart,
@@ -4089,17 +4088,17 @@
 		};
 	
 		var data = _fnAjaxDataSrc( settings, json );
-		var draw            = compat( 'sEcho',                'draw' );
+		//var draw            = compat( 'sEcho',                'draw' );
 		var recordsTotal    = compat( 'iTotalRecords',        'recordsTotal' );
 		var recordsFiltered = compat( 'iTotalDisplayRecords', 'recordsFiltered' );
 	
-		if ( draw ) {
+		/*if ( draw ) {
 			// Protect against out of sequence returns
 			if ( draw*1 < settings.iDraw ) {
 				return;
 			}
 			settings.iDraw = draw * 1;
-		}
+		}*/
 	
 		_fnClearTable( settings );
 		settings._iRecordsTotal   = parseInt(recordsTotal, 10);
@@ -11396,7 +11395,8 @@
 			 *      } );
 			 *    } );
 			 */
-			"sInfo": "Showing _START_ to _END_ of _TOTAL_ entries",
+			//"sInfo": "Showing _START_ to _END_ of _TOTAL_ entries",
+			"sInfo": "总共 _TOTAL_ 条 当前为第 _PAGE_ 页",
 	
 	
 			/**

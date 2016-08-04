@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+	{{> globel/head}}
+	{{{_sections.css}}}
+</head>
+<body class="sticky-header left-side-collapsed">
+	<section>
+		{{!-- header section start --}}
+		{{> globel/header-side}}
+		{{!-- header section end --}}
+
+		<!-- main content start-->
+		<div class="main-content" >
+			{{!-- header section start --}}
+			{{> globel/header-side-nav}}
+			{{!-- header section end --}}
+
+			{{!-- header-sub section start --}}
+			{{{_sections.headerSub}}}
+			{{!-- header-sub section end --}}
+
+			{{!-- body wrapper start --}}
+			<div id="wrapper" class="wrapper">
+				{{{body}}}
+			</div>
+			{{!-- body wrapper end --}}
+
+			{{!-- footer section start --}}
+			{{> globel/footer-full}}
+			{{!-- footer section end --}}
+
+		</div>
+		{{!-- main content end --}}
+
+	</section>
+	<script>
+	var _USER_ = {{config.user}};
+	</script>
+	{{> globel/script}}
+	{{{_sections.js}}}
+</body>
+</html>

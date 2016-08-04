@@ -1,27 +1,15 @@
 'use strict';
 
-var localhost = process.env.localhost || 'false';
-var env       = process.env.NODE_ENV  || 'development';
-var online;
-var noLocal;
-noL();
-
-function noL() {
-	online  = localhost == 'false'? env: 'localhost';
-	noLocal = (online != 'localhost');
-	console.log(noLocal);
-}
+var env = process.env.NODE_ENV || 'localhost';
 
 var gulp        = require('gulp');
 /* html */
-var minifyHTML  = require('gulp-minify-html');	// html压缩
+var htmlmin     = require('gulp-htmlmin');		// html压缩
 var replace     = require('gulp-replace');		// 替换
 /* css */
-var less        = require('gulp-less');			// less编译
+var less        = require('gulp-less');			// less
 var csso        = require('gulp-csso');			// css压缩
 /* js */
-var coffee      = require('gulp-coffee');		// coffee-script编译
-var babel       = require('gulp-babel');		// ES2015(ES6)编译
 var uglify      = require('gulp-uglify');		// js混淆
 /* img */
 //var imagemin    = require('gulp-imagemin');
@@ -52,7 +40,6 @@ gulp.task('nodemon', function(cb) {
 		// nodemon our expressjs server
 		script: 'bin/www',
 		env: {
-			localhost: localhost,
 			NODE_ENV: env
 		},
 		ext: '*',
@@ -84,109 +71,82 @@ gulp.task('browser-sync', function() {
 		proxy: 'http://localhost:3010',
 		// informs browser-sync to use the following port for the proxied app
 		// notice that the default port is 3000, which would clash with our expressjs
-		port: 4010,
+		port: 3000,
 		// open the proxied app in chrome
 		browser: 'default'
 	});
 });
 
-gulp.task('default', ['browser-sync']);
+gulp.task('default', ['build:localhost']);
 
 /* 编译LESS */
-gulp.task('less', function() {
-	var lessSrc = ['public/less/**/*.less', '!public/less/common/*.less'];
-	var cssDest = noLocal? 'public/build/css': 'public/css';
-	if (noLocal) {
-		return gulp.src(lessSrc)
+gulp.task('less:dev', function() {
+	var lessSrc = 'public/less/*.less';
+	var cssDest = 'public/build/css';
+	return gulp.src(lessSrc)
 		.pipe(less())
-		.pipe(rev())
 		.pipe(csso())
+		.pipe(rev())
 		.pipe(gulp.dest(cssDest))
 		.pipe(rev.manifest({
 			base: 'public/build',
-			merge: true // merge with the existing manifest (if one exists)
+			merge: true
 		}))
 		.pipe(gulp.dest('build/assets'));
-	} else {
-		return gulp.src(lessSrc)
+});
+
+gulp.task('less:lo', function() {
+	var lessSrc = 'public/less/*.less';
+	var cssDest = 'public/css';
+	return gulp.src(lessSrc)
 		.pipe(sourcemaps.init({ loadMaps: true }))
 		.pipe(less())
 		.pipe(sourcemaps.write('/'))
 		.pipe(gulp.dest(cssDest));
-	}
 });
 
-/* 编译ES6 to JS */
-gulp.task('ES6', function() {
-	var jsSrc = ['public/ES6/**/*.es6'];
-	var jsDest = 'public/dist/js';
-	return gulp.src(jsSrc)
-	.pipe(babel({ presets: ['es2015'] }))
-	.pipe(gulp.dest(jsDest));
-});
-
-/* 编译COFFEE to JS */
-gulp.task('coffee', function() {
-	var jsSrc  = ['public/coffee/**/*.coffee'];
-	var jsDest = 'public/dist/js';
-	return gulp.src(jsSrc)
-	.pipe(sourcemaps.init({ loadMaps: true }))
-	.pipe(coffee())
-	.pipe(sourcemaps.write('/'))
-	.pipe(gulp.dest(jsDest));
-});
-
-/* 业务类js */
-gulp.task('jsc', function() {
-	var jsSrc  = ['public/js/*.js'];
+/* 复制业务js */
+gulp.task('js', function() {
+	var jsSrc  = 'public/js/*.js';
 	var jsDest = 'public/build/js';
-	if (noLocal) {
-		gulp.src(jsSrc)
+	gulp.src(jsSrc)
 		.pipe(gulp.dest(jsDest));
-	}
 });
 
 /* 合并lib.js */
 gulp.task('concat', function() {
 	var p = 'public/js/lib/';
 	var jsSrc  = [p+'jquery.js', p+'bootstrap.js', p+'MJJS.js', p+'common.js'];
-	var jsDest = 'public/dist/js';
-	if (noLocal) {
-		gulp.src(jsSrc)
+	var jsDest = 'public/build/js';
+	gulp.src(jsSrc)
 		.pipe(concat('lib.js'))
 		.pipe(gulp.dest(jsDest));
-	}
 });
 
 /* 压缩JS */
-gulp.task('js', function() {
-	var jsSrc  = ['public/dist/js/*.js', 'public/build/js/*.js'];
+gulp.task('uglify', function() {
+	var jsSrc  = 'public/build/js/*.js';
 	var jsDest = 'public/build/js';
-	if (noLocal) {
-		return gulp.src(jsSrc)
+	return gulp.src(jsSrc)
 		.pipe(rev())
 		.pipe(uglify())
 		.pipe(gulp.dest(jsDest))
 		.pipe(rev.manifest({
 			base: 'public/build',
-			merge: true // merge with the existing manifest (if one exists)
+			merge: true
 		}))
 		.pipe(gulp.dest('build/assets'));
-	}
 });
 
 gulp.task('util', function() {
 	var jsSrc  = ['public/js/util/**/*'];
 	var jsDest = 'public/build/js/util';
-	if (noLocal) {
-		return gulp.src(jsSrc)
+	return gulp.src(jsSrc)
 		.pipe(gulp.dest(jsDest));
-	}
 });
 
 gulp.task('images', function() {
-	if (noLocal) {
-		return gulp.src('public/img/**/*')
+	return gulp.src('public/img/**/*')
 		.pipe(rev())
 		// .pipe(imagemin({
 		//   optimizationLevel: 3,
@@ -196,71 +156,65 @@ gulp.task('images', function() {
 		.pipe(gulp.dest('public/build/img'))
 		.pipe(rev.manifest({
 			base: 'public/build',
-			merge: true // merge with the existing manifest (if one exists)
+			merge: true
 		}))
 		.pipe(gulp.dest('build/assets'));
-	}
 });
 
 /* 字体Copy */
 gulp.task('fonts', function() {
-	if (noLocal) {
-		return gulp.src('public/fonts/**/*')
+	return gulp.src('public/fonts/**/*')
 		.pipe(gulp.dest('public/build/fonts'));
-	}
 });
 
 gulp.task('revReplace', function() {
-	var manifest = gulp.src('rev-manifest.json');
-	if (noLocal) {
-		return gulp.src('views/**/*.hbs')
+	var manifest = gulp.src('./rev-manifest.json');
+	return gulp.src('views/**/*.hbs')
 		.pipe(revReplace({
-			manifest: manifest,
-			replaceInExtensions: ['.hbs']
+			manifest: manifest
 		}))
 		.pipe(rename({ extname: '.html' }))
-		.pipe(minifyHTML({
-			empty: true,
-			spare: true
+		.pipe(htmlmin({
+			includeAutoGeneratedTags: false,		// 自动插入闭合标签 (handlebars模板引擎必须为false)
+			removeComments: true,					// 删除HTML注释
+			//removeEmptyElements: true,			// 删除空白HTML标签
+			removeEmptyAttributes: true,			// 删除所有空格作属性值 <input id="" /> ==> <input />
+			removeScriptTypeAttributes: true,		// 删除<script>的type="text/javascript"
+			removeStyleLinkTypeAttributes: true,	// 删除<style>和<link>的type="text/css"
+			collapseWhitespace: true,				// 压缩HTML
+			collapseBooleanAttributes: true,		// 省略布尔属性的值 <input checked="true"/> ==> <input />
+			minifyJS: true,							// 压缩页面JS
+			minifyCSS: true							// 压缩页面CSS
 		}))
 		.pipe(rename({ extname: '.hbs' }))
 		.pipe(gulp.dest('views/build'));
-		}
-});
-
-gulp.task('build', function() {
-	return runSequence(
-		['clean:init'],
-		['images', 'fonts', 'less', 'util', 'jsc'],
-		//['ES6', 'coffee'],
-		[ 'concat'],
-		['js'],
-		['revReplace'],
-		['clean:end'],
-		['nodemon'],
-		['browser-sync']
-	)();
 });
 
 gulp.task('build:localhost', function() {
-	localhost = 'true';
-	env = 'development';
-	noL();
-	gulp.start('build');
+	env = 'localhost';
+	return runSequence(
+		'clean:init',	// 初始化清除文件
+		'less:lo',		// 编译less
+		'clean:end',	// 结束清除文件
+		'nodemon',		// 代码部署
+		'browser-sync'
+	)();
 });
 
 gulp.task('build:dev', function() {
-	localhost = 'false';
 	env = 'development';
-	noL();
-	gulp.start('build');
-});
-
-gulp.task('build:prd', function() {
-	localhost = 'false';
-	env = 'production';
-	noL();
-	gulp.start('build');
+	return runSequence(
+		'clean:init',	// 初始化清除文件
+		'concat',		// 合并js
+		'js',			// 复制业务js
+		'images',		// 复制图片
+		'fonts',		// 复制字体
+		'uglify',		// js压缩
+		'less:dev',		// 编译less
+		'util',			// 复制js组件
+		'revReplace',	// 替换hbs
+		'clean:end'		// 结束清除文件
+	)();
 });
 
 gulp.task('clean:init', function () {

@@ -1,0 +1,23 @@
+<section class="panel">
+	<header class="panel-heading custom-tab turquoise-tab">
+		<ul class="nav nav-tabs">
+			<li class="active">
+				<a data-toggle="tab" href="#flotCharts">Flot Charts</a>
+			</li>
+		</ul>
+	</header>
+	<div class="panel-body bg-color-main">
+		<div class="tab-content">
+			<div id="flotCharts" class="tab-pane active">{{> demo/flot-charts}}</div>
+		</div>
+	</div>
+</section>
+
+
+{{#section 'css'}}
+
+{{/section}}
+
+{{#section 'js'}}
+<script src="/js/demo-chart.js"></script>
+{{/section}}

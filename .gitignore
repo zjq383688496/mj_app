@@ -1,8 +1,7 @@
 node_modules
 css
 dist
+demo
 views/build
 public/build
-.tmp
-.sass-cache
 npm-debug.log

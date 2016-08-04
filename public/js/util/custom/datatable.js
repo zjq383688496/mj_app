@@ -13,9 +13,10 @@
 			this.datatable.init(parent, opts.datatable);
 		},
 		__: {
-			_select_: [],
+			_select_:      [],
+			_input_:       [],
 			_inputSelect_: [],
-			_input_: []
+			_inputDate_:   []
 		},
 		random: function() {
 			return ''+Math.round(Math.random()*12345*Math.random()*67890);
@@ -29,6 +30,8 @@
 				parent: '<select id="{ID}" class="form-control m-bot15" value="{defaultValue}" data-key="{key}" data-reload="{reload}">{option}</select>',
 				option: '<option value="{value}">{name}</option>'
 			},
+			label: '<div class="form-group m-bot15 clearfix form-horizontal text-{dir}"><label class="control-label">{name}</label></div>',
+			input: '<div class="form-group m-bot15 clearfix"><input id="{ID}" type="text" class="form-control" placeholder="{placeholder}" data-key=\'{key}\'></div>',
 			inputSelect: {
 				parent: [
 					'<div class="input-group m-bot15">',
@@ -46,7 +49,15 @@
 					'</div>'
 				].join(''),
 				option: '<li><a key="{key}">{name}</a></li>'
-			}
+			},
+			inputDate: [
+				'<div id="{ID}" class="form_datetime input-group date m-bot15" data-key="{key}" data-opts="{opts}">',
+					'<input type="text" class="form-control" readonly placeholder="{placeholder}">',
+					'<span class="input-group-btn">',
+						'<button type="button" class="btn btn-success date-set"><i class="fa fa-calendar"></i></button>',
+					'</span>',
+				'</div>'
+				].join('')
 		},
 		// 模块解析
 		analysis: {
@@ -101,6 +112,10 @@
 				}
 				return _option.join('');
 			},
+			label: function(opts, temp) {
+				opts.dir = opts.dir? opts.dir: 'left';
+				return temp.substitute(opts);
+			},
 			select: function(opts, temp) {
 				var me = mj_dataTable.prototype;
 				var ID = me.__._ID_+me.random();
@@ -113,6 +128,13 @@
 					defaultValue: opts.option[0].value,
 					option: option
 				});
+			},
+			input: function(opts, temp) {
+				var me = mj_dataTable.prototype;
+				var ID = me.__._ID_+me.random();
+				opts.ID = ID;
+				me.__._input_.push(ID);
+				return temp.substitute(opts);
 			},
 			inputSelect: function(opts, temp) {
 				var me  = mj_dataTable.prototype;
@@ -130,13 +152,23 @@
 				dir['select_' + (opts.dir || 'left')] = select;
 				me.__._inputSelect_.push(ID);
 				return temp.parent.substitute(dir);
+			},
+			inputDate: function(opts, temp) {
+				var me = mj_dataTable.prototype;
+				var ID = me.__._ID_+me.random();
+				opts.ID = ID;
+				opts.opts = MJJS.json.stringify(opts.opts).replace(/\"/g, '\'');
+				me.__._inputDate_.push(ID);
+				return temp.substitute(opts);
 			}
 		},
 		// 事件绑定
 		bindEvent: {
 			init: function() {
 				this.select();
+				this.input();
 				this.inputSelect();
+				this.inputDate();
 			},
 			select: function() {
 				var me = mj_dataTable.prototype;
@@ -150,6 +182,10 @@
 						});
 					}
 				});
+			},
+			input: function() {
+				// var me = mj_dataTable.prototype;
+				// var id = me.__._input_;
 			},
 			inputSelect: function() {
 				var me = mj_dataTable.prototype;
@@ -165,6 +201,22 @@
 						ipt.attr({ placeholder: name });
 					});
 				});
+			},
+			inputDate: function() {
+				var me = mj_dataTable.prototype;
+				var id = me.__._inputDate_;
+				if (id.length) {
+					MJJS.load(['timepicker'], function() {
+						$.each(id, function(i, e) {
+							var _ = $('#'+e);
+							MJJS.ui.timepicker('#'+e, {
+								callback: function() {
+									me.__._oTable_._fnAjaxUpdate();
+								}
+							});
+						});
+					});
+				}
 			}
 		},
 		datatable: {
@@ -179,12 +231,16 @@
 					searching: false,
 					processing: true,
 					serverSide: true,
+					bLengthChange: false,
+					pageLength: opts.pageLength || 10,
 					ajax: {
 						url: url,
 						type: type,
 						data: function(d) {
 							_this.select(d);
+							_this.input(d);
 							_this.inputSelect(d);
+							_this.inputDate(d);
 						}
 					},
 					language: {
@@ -200,6 +256,7 @@
 				}
 				me.__._oTable_ = $(parent)
 				.on('init.dt', function () {
+					me.__._oTable_.removeAttr('style');
 					if (typeof(opts.load) === 'function') opts.load(me.__._oTable_);
 				})
 				.dataTable(data);
@@ -238,6 +295,20 @@
 					d[_.attr('data-key')] = _.val();
 				});
 			},
+			input: function(d) {
+				var me = mj_dataTable.prototype;
+				var id = me.__._input_;
+				$.each(id, function(i, e) {
+					var _ = $('#'+e);
+					d[_.attr('data-key')] = _.val();
+					_.on('keydown', function(event) {
+						var code = event.keyCode || evt.which;
+						if (code === 13) {
+							me.__._oTable_._fnAjaxUpdate();
+						}
+					});
+				});
+			},
 			inputSelect: function(d) {
 				var me = mj_dataTable.prototype;
 				var id = me.__._inputSelect_;
@@ -252,6 +323,15 @@
 							me.__._oTable_._fnAjaxUpdate();
 						}
 					});
+				});
+			},
+			inputDate: function(d) {
+				var me = mj_dataTable.prototype;
+				var id = me.__._inputDate_;
+				$.each(id, function(i, e) {
+					var _ = $('#'+e);
+					var ipt    = _.find('input');
+					d[_.attr('data-key')] = ipt.val();
 				});
 			}
 		}

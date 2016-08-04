@@ -1,472 +1,228 @@
 {{!-- <h1>Hello World!</h1> --}}
 <div class="row">
-	<!-- page heading start-->
-	<div class="page-heading">
-		<h3>Dashboard</h3>
-		<ul class="breadcrumb">
-			<li>
-				<a href="#">Dashboard</a>
-			</li>
-			<li class="active"> My Dashboard </li>
-		</ul>
-		<div class="state-info">
-			<section class="panel">
-				<div class="panel-body">
-					<div class="summary">
-						<span>yearly expense</span>
-						<h3 class="red-txt">$ 45,600</h3>
-					</div>
-					<div id="income" class="chart-bar"></div>
-				</div>
-			</section>
-			<section class="panel">
-				<div class="panel-body">
-					<div class="summary">
-						<span>yearly  income</span>
-						<h3 class="green-txt">$ 45,600</h3>
-					</div>
-					<div id="expense" class="chart-bar"></div>
-				</div>
-			</section>
-		</div>
-	</div>
-	<!-- page heading end-->
-</div>
-<hr>
-<div class="row">
-	<div class="col-md-6">
-		<!--statistics start-->
-		<div class="row state-overview">
-			<div class="col-md-6 col-xs-12 col-sm-6">
-				<div class="panel purple">
+	<div class="col-md-12 state-block">
+		<div class="col-md-2 state-overview">
+			<div class="row">
+				<div class="panel primary">
 					<div class="symbol">
-						<i class="fa fa-gavel"></i>
+						<i class="fa fa-clipboard"></i>
 					</div>
 					<div class="state-value">
-						<div class="value">230</div>
-						<div class="title">New Order</div>
+						<div id="sum_adgroup" class="value">0</div>
+						<small>广告组总数</small>
 					</div>
 				</div>
 			</div>
-			<div class="col-md-6 col-xs-12 col-sm-6">
+		</div>
+		<div class="col-md-2 state-overview">
+			<div class="row">
+				<div class="panel yellow">
+					<div class="symbol">
+						<i class="fa fa-ticket"></i>
+					</div>
+					<div class="state-value">
+						<div id="normalAdgroupsum" class="value">0</div>
+						<small>投放中的广告组数</small>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-3 state-overview">
+			<div class="row">
+				<div class="panel light">
+					<div class="symbol">
+						<i class="fa fa-jpy"></i>
+					</div>
+					<div class="state-value">
+						<div id="balance" class="value">0</div>
+						<small>账户余额</small><br>
+						<small>每日投放限额：<span id="dailyBudget">0</span> <a id="budget"><i class="fa fa-pencil"></i></a></small>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-2 state-overview">
+			<div class="row">
 				<div class="panel red">
 					<div class="symbol">
-						<i class="fa fa-tags"></i>
+						<i class="fa fa-user"></i>
 					</div>
 					<div class="state-value">
-						<div class="value">3490</div>
-						<div class="title">Copy Sold</div>
+						<div id="yesterdayclick" class="value">0</div>
+						<small>昨日广告点击量</small>
 					</div>
 				</div>
 			</div>
 		</div>
-		<div class="row state-overview">
-			<div class="col-md-6 col-xs-12 col-sm-6">
-				<div class="panel blue">
-					<div class="symbol">
-						<i class="fa fa-money"></i>
-					</div>
-					<div class="state-value">
-						<div class="value">22014</div>
-						<div class="title"> Total Revenue</div>
-					</div>
-				</div>
-			</div>
-			<div class="col-md-6 col-xs-12 col-sm-6">
+		<div class="col-md-2 state-overview">
+			<div class="row">
 				<div class="panel green">
 					<div class="symbol">
-						<i class="fa fa-eye"></i>
+						<i class="fa fa-star"></i>
 					</div>
 					<div class="state-value">
-						<div class="value">390</div>
-						<div class="title"> Unique Visitors</div>
+						<div id="yesterdaycost" class="value">0</div>
+						<small>总消耗金额</small>
 					</div>
 				</div>
 			</div>
 		</div>
-		<!--statistics end-->
-	</div>
-	<div class="col-md-6">
-		<!--more statistics box start-->
-		<div class="panel deep-purple-box">
-			<div class="panel-body">
-				<div class="row">
-					<div class="col-md-7 col-sm-7 col-xs-7">
-						<div id="graph-donut" class="revenue-graph"></div>
-					</div>
-					<div class="col-md-5 col-sm-5 col-xs-5">
-						<ul class="bar-legend">
-							<li><span class="blue"></span> Open rate</li>
-							<li><span class="green"></span> Click rate</li>
-							<li><span class="purple"></span> Share rate</li>
-							<li><span class="red"></span> Unsubscribed rate</li>
-						</ul>
-					</div>
-				</div>
-			</div>
-		</div>
-		<!--more statistics box end-->
 	</div>
 </div>
-<div class="row">
-	<div class="col-md-8">
-		<div class="panel">
-			<div class="panel-body">
-				<div class="row revenue-states">
-					<div class="col-md-6 col-sm-6 col-xs-12">
-						<h4>Monthly revenue report</h4>
-						<div class="icheck">
-							<div class="square-red single-row">
-								<div class="checkbox">
-									<label><input type="checkbox" checked>
-									Online</label>
-								</div>
-							</div>
-							<div class="square-blue single-row">
-								<div class="checkbox">
-									<label><input type="checkbox">
-									Offline</label>
-								</div>
-							</div>
-						</div>
+<hr>
 
-					</div>
-					<div class="col-md-6 col-sm-6 col-xs-12">
-						<ul class="revenue-nav">
-							<li><a>weekly</a></li>
-							<li><a>monthly</a></li>
-							<li class="active"><a>yearly</a></li>
-						</ul>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-md-12">
-						<div class="clearfix">
-							<div id="main-chart-legend" class="pull-right">
-							</div>
-						</div>
+<!-- page heading start-->
+<h3>投放数据</h3>
+<!-- page heading end-->
 
-						<div id="main-chart">
-							<div id="main-chart-container" class="main-chart"></div>
-						</div>
-						<ul class="revenue-short-info">
-							<li>
-								<h1 class="red">15%</h1>
-								<p>Server Load</p>
-							</li>
-							<li>
-								<h1 class="purple">30%</h1>
-								<p>Disk Space</p>
-							</li>
-							<li>
-								<h1 class="green">84%</h1>
-								<p>Transferred</p>
-							</li>
-							<li>
-								<h1 class="blue">28%</h1>
-								<p>Temperature</p>
-							</li>
-						</ul>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="col-md-4">
-		<div class="panel">
+<div id="delivery" class="row hide">
+	<div class="col-md-12">
+		<section class="panel">
 			<header class="panel-heading">
-				goal progress
+				整体情况
+				&nbsp;&nbsp;
+				<a class="text-muted">查看详情</a>
+				&nbsp;&nbsp;
 				<span class="tools pull-right">
 					<a href="javascript:;" class="fa fa-chevron-up"></a>
 					<a href="javascript:;" class="fa fa-times"></a>
-				 </span>
+				</span>
+				<small class="text-muted">(过去7天数据)</small>
 			</header>
 			<div class="panel-body">
-				<ul class="goal-progress">
-					<li>
-						<div class="prog-avatar">
-							<img src="img/photos/user1.png" alt=""/>
+				<div class="row">
+					<div class="col-md-2 state-overview-s">
+						<div class="panel primary">
+							<small>曝光量 (次)</small>
+							<div class="value">230</div>
 						</div>
-						<div class="details">
-							<div class="title">
-								<a href="#">John Doe</a> - Project Lead
-							</div>
-							<div class="progress progress-xs">
-								<div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: 70%">
-									<span class="">70%</span>
-								</div>
-							</div>
+					</div>
+					<div class="col-md-2 state-overview-s">
+						<div class="panel yellow">
+							<small>点击量 (次)</small>
+							<div class="value">230</div>
 						</div>
-					</li>
-					<li>
-						<div class="prog-avatar">
-							<img src="img/photos/user2.png" alt=""/>
+					</div>
+					<div class="col-md-2 state-overview-s">
+						<div class="panel light">
+							<small>平均点击率</small>
+							<div class="value">230</div>
 						</div>
-						<div class="details">
-							<div class="title">
-								<a href="#">Cameron Doe</a> - Sales
-							</div>
-							<div class="progress progress-xs">
-								<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: 91%">
-									<span class="">91%</span>
-								</div>
-							</div>
+					</div>
+					<div class="col-md-2 state-overview-s">
+						<div class="panel red">
+							<small>花费 (元)</small>
+							<div class="value">230</div>
 						</div>
-					</li>
-					<li>
-						<div class="prog-avatar">
-							<img src="img/photos/user3.png" alt=""/>
-						</div>
-						<div class="details">
-							<div class="title">
-								<a href="#">Hoffman Doe</a> - Support
-							</div>
-							<div class="progress progress-xs">
-								<div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
-									<span class="">40%</span>
-								</div>
-							</div>
-						</div>
-					</li>
-					<li>
-						<div class="prog-avatar">
-							<img src="img/photos/user4.png" alt=""/>
-						</div>
-						<div class="details">
-							<div class="title">
-								<a href="#">Jane Doe</a> - Marketing
-							</div>
-							<div class="progress progress-xs">
-								<div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: 20%">
-									<span class="">20%</span>
-								</div>
-							</div>
-						</div>
-					</li>
-					<li>
-						<div class="prog-avatar">
-							<img src="img/photos/user5.png" alt=""/>
-						</div>
-						<div class="details">
-							<div class="title">
-								<a href="#">Hoffman Doe</a> - Support
-							</div>
-							<div class="progress progress-xs">
-								<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: 45%">
-									<span class="">45%</span>
-								</div>
-							</div>
-						</div>
-					</li>
-				</ul>
-				<div class="text-center"><a href="#">View all Goals</a></div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-2">
+						<select id="deliverySelect1" class="form-control m-bot15"></select>
+					</div>
+					<div class="col-md-8"></div>
+					<div class="col-md-2">
+						<select id="deliverySelect2" class="form-control m-bot15">
+						</select>
+					</div>
+				</div>
+				<div id="delivery-chart">
+					<div id="delivery-container" style="width: 100%;height:300px; text-align: center; margin:0 auto;">
+					</div>
+				</div>
 			</div>
-		</div>
+		</section>
 	</div>
 </div>
-<div class="row">
-	<div class="col-md-4">
-		<div class="panel">
-			<div class="panel-body extra-pad">
-				<h4 class="pros-title">prospective <span>leads</span></h4>
-				<div class="row">
-					<div class="col-sm-12 col-xs-12">
-						<div id="p-lead-1" data-opts="{type: 'bar',height: '35',barWidth: 16,barSpacing: 6,barColor: '#65cea7'}"></div>
-						<p class="p-chart-title">iPhone</p>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="col-md-4">
-		<div class="panel">
-			<div class="panel-body extra-pad">
-				<div class="col-sm-12 col-xs-12">
-					<div class="v-title">Visits</div>
-					<div class="v-value">10,090</div>
-					<div id="visit-1" data-opts="{type: 'line',width: '360',height: '25',lineColor: '#55accc',fillColor: '#edf7f9'}"></div>
-					<div class="v-info">Pages/Visit</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="col-md-4">
 
-		<div class="panel green-box">
-			<div class="panel-body extra-pad">
-				<div class="row">
-					<div class="col-sm-6 col-xs-6">
-						<div class="knob">
-							<span class="chart" data-percent="79">
-								<span class="percent">79% <span class="sm">New Visit</span></span>
-							</span>
-						</div>
-					</div>
-					<div class="col-sm-6 col-xs-6">
-						<div class="knob">
-							<span class="chart" data-percent="56">
-								<span class="percent">56% <span class="sm">Bounce rate</span></span>
-							</span>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
 <div class="row">
-	<div class="col-md-4">
-		<div class="panel">
-			<div class="panel-body">
-				<div class="calendar-block">
-					<div class="cal1"></div>
-				</div>
-
-			</div>
-		</div>
-	</div>
-	<div class="col-md-4">
-		<div class="panel">
+	<div class="col-md-12">
+		<section class="panel">
 			<header class="panel-heading">
-				Todo List
+				受众分布
+				<a class="tooltips" data-toggle="tooltip" data-placement="right" title="" data-original-title="根据每日投放数据，从年龄、性别和地域三个纬度汇总受众人群信息"><i class="fa fa-question-circle"></i></a>
 				<span class="tools pull-right">
-					<a class="fa fa-chevron-up"></a>
-					<a class="fa fa-times"></a>
-				 </span>
+					<a href="javascript:;" class="fa fa-chevron-up"></a>
+					<a href="javascript:;" class="fa fa-times"></a>
+				</span>
 			</header>
 			<div class="panel-body">
-				<ul class="to-do-list" id="sortable-todo">
-					<li class="clearfix">
-						<span class="drag-marker">
-						<i></i>
-						</span>
-						<div class="todo-check pull-left">
-							<input type="checkbox" value="None" id="todo-check"/>
-							<label for="todo-check"></label>
-						</div>
-						<p class="todo-title">
-							Dashboard Design & Wiget placement
-						</p>
-						<div class="todo-actionlist pull-right clearfix">
-							<a href="javascript:;" class="todo-remove"><i class="fa fa-times"></i></a>
-						</div>
-					</li>
-					<li class="clearfix">
-						<span class="drag-marker">
-						<i></i>
-						</span>
-						<div class="todo-check pull-left">
-							<input type="checkbox" value="None" id="todo-check1"/>
-							<label for="todo-check1"></label>
-						</div>
-						<p class="todo-title">
-							Wireframe prepare for new design
-						</p>
-						<div class="todo-actionlist pull-right clearfix">
-							<a href="javascript:;" class="todo-remove"><i class="fa fa-times"></i></a>
-						</div>
-					</li>
-					<li class="clearfix">
-						<span class="drag-marker">
-						<i></i>
-						</span>
-						<div class="todo-check pull-left">
-							<input type="checkbox" value="None" id="todo-check2"/>
-							<label for="todo-check2"></label>
-						</div>
-						<p class="todo-title">
-							UI perfection testing for Mega Section
-						</p>
-						<div class="todo-actionlist pull-right clearfix">
-							<a href="javascript:;" class="todo-remove"><i class="fa fa-times"></i></a>
-						</div>
-					</li>
-					<li class="clearfix">
-						<span class="drag-marker">
-						<i></i>
-						</span>
-						<div class="todo-check pull-left">
-							<input type="checkbox" value="None" id="todo-check3"/>
-							<label for="todo-check3"></label>
-						</div>
-						<p class="todo-title">
-							Wiget & Design placement
-						</p>
-						<div class="todo-actionlist pull-right clearfix">
-							<a href="javascript:;" class="todo-remove"><i class="fa fa-times"></i></a>
-						</div>
-					</li>
-					<li class="clearfix">
-						<span class="drag-marker">
-						<i></i>
-						</span>
-						<div class="todo-check pull-left">
-							<input type="checkbox" value="None" id="todo-check4"/>
-							<label for="todo-check4"></label>
-						</div>
-						<p class="todo-title">
-							Development & Wiget placement
-						</p>
-						<div class="todo-actionlist pull-right clearfix">
-							<a href="javascript:;" class="todo-remove"><i class="fa fa-times"></i></a>
-						</div>
-					</li>
-				</ul>
-				<div class="row">
-					<div class="col-md-12">
-						<form role="form" class="form-inline">
-							<div class="form-group todo-entry">
-								<input type="text" placeholder="Enter your ToDo List" class="form-control" style="width: 100%">
+				<div class="col-md-5">
+					<div class="row">
+						<div class="col-md-12">
+							<div id="age-chart">
+								<div id="age-container" style="width: 100%;height:250px; text-align: center; margin:0 auto;">
+								</div>
 							</div>
-							<button class="btn btn-primary pull-right" type="submit">+</button>
-						</form>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-12">
+							<div id="gender-chart">
+								<div id="gender-container" style="width: 100%;height:250px; text-align: center; margin:0 auto;">
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-7">
+					<div class="row">
+						<div id="map-chart">
+							<div id="map-container" style="width: 100%;height:500px; text-align: center; margin:0 auto;">
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
+		</section>
 	</div>
-	<div class="col-md-4">
-		<div class="panel blue-box twt-info">
-			<div class="panel-body">
-				<h3>19 Februay 2014</h3>
+</div>
 
-				<p>AdminEx is new model of admin
-				dashboard <a href="#">http://t.co/3laCVziTw4</a>
-				4 days ago by John Doe</p>
-			</div>
-		</div>
-		<div class="panel">
+<div class="row">
+	<div class="col-md-12">
+		<section class="panel">
+			<header class="panel-heading">
+				广告组列表
+				<span class="tools pull-right">
+					<a href="javascript:;" class="fa fa-chevron-up"></a>
+					<a href="javascript:;" class="fa fa-times"></a>
+				</span>
+			</header>
 			<div class="panel-body">
-				<div class="media usr-info">
-					<a href="#" class="pull-left">
-						<img class="thumb" src="img/photos/user2.png" alt=""/>
-					</a>
-					<div class="media-body">
-						<h4 class="media-heading">Mila Watson</h4>
-						<span>Senior UI Designer</span>
-						<p>I use to design websites and applications for the web.</p>
-					</div>
+				<div class="adv-table">
+					<table class="display table table-bordered table-striped" id="adv-list">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>广告组名称</th>
+								<th>位置</th>
+								<th>素材样式</th>
+								<th>出价</th>
+								{{!-- <th>上线时间</th>
+								<th>审核状态</th>
+								<th>投放状态</th>
+								<th>备注</th>
+								<th>操作</th> --}}
+							</tr>
+						</thead>
+					</table>
 				</div>
 			</div>
-			<div class="panel-footer custom-trq-footer">
-				<ul class="user-states">
-					<li>
-						<i class="fa fa-heart"></i> 127
-					</li>
-					<li>
-						<i class="fa fa-eye"></i> 853
-					</li>
-					<li>
-						<i class="fa fa-user"></i> 311
-					</li>
-				</ul>
-			</div>
-		</div>
+		</section>
 	</div>
 </div>
 
 {{#section 'css'}}
 
+{{/section}}
+
+{{#section 'headerSub'}}
+<div class="alert alert-warning fade in">
+	<button type="button" class="close close-sm" data-dismiss="alert">
+		<i class="fa fa-times"></i>
+	</button>
+	<small>亲爱的客户：您未通过公司主体证明审核，新建广告默认为不通过。请进入<a>资质证书</a>中补全资料，通过审核后可正常投放广告。您的余额不足，请点击右侧菜单立即联系运营人员进行充值，否则广告无法正常投放。</small>
+</div>
 {{/section}}
 
 {{#section 'js'}}

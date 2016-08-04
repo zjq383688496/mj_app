@@ -259,8 +259,10 @@
 	(function() {
 		$.extend(String.prototype, {
 			isIP: function() {
-				var re = /^(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9])\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9])$/;
-				return re.test(this.trim());
+				var result = this.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+				if (!result) return false;
+				if (result[1] > 255 || result[2] > 255 || result[3] > 255 || result[4] > 255) return false;
+				return true;
 			},
 			isUrl: function() {
 				return (new RegExp(/^(ftp|https?):\/\/([^\s\.]+\.[^\s]{2,}|localhost)$/i).test(this.trim()));
@@ -275,10 +277,16 @@
 				return (d.getFullYear() == result[1] && d.getMonth() + 1 == result[3] && d.getDate() == result[4]);
 			},
 			isTime: function() {
-				var result = this.match(/^(\d{1,2})(:)?(\d{1,2})\2(\d{1,2})$/);
-				if (result === null) return false;
-				if (result[1] > 24 || result[3] > 60 || result[4] > 60) return false;
+				var result = this.match(/^(\d{1,2}):(\d{2}):(\d{2})$/);
+				if (!result) return false;
+				if (result[1] > 23 || result[2] > 59 || result[3] > 59) return false;
 				return true;
+			},
+			isDateTime: function() {
+				var result = this.match(/^(\d{4})[-|\/](\d{1,2})[-|\/](\d{1,2}) (\d{1,2}):(\d{1,2}):(\d{1,2})$/);
+				if (!result) return false;
+				var date = new Date(result[1], result[2]-1, result[3], result[4], result[5], result[6]);
+				return date.getFullYear()==result[1] && date.getMonth()+1==result[2] && date.getDate()==result[3] && date.getHours()==result[4] && date.getMinutes()==result[5] && date.getSeconds()==result[6];
 			},
 			// 整数
 			isInteger: function() {
@@ -342,12 +350,6 @@
 				var r15 = new RegExp(/^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$/);
 				var r18 = new RegExp(/^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X|x)$/);
 				return (r15.test(this.trim()) || r18.test(this.trim()));
-			},
-			isVisa: function() {
-				return this.isCardNo('Visa');
-			},
-			isMasterCard: function() {
-				return this.isCardNo('MasterCard');
 			}
 		});
 	})();
@@ -363,16 +365,8 @@
 				return source.join('.');
 			},
 			// 生成随机数
-			randomInt: function(min, max) {
+			random: function(min, max) {
 				return Math.floor(Math.random() * (max - min + 1) + min);
-			},
-			// 左侧补齐，返回为字符串
-			padLeft: function(width, ch) {
-				return ('' + this).padLeft(width, ch);
-			},
-			// 右侧补齐，返回字符串
-			padRight: function(width, ch) {
-				return ('' + this).padRight(width, ch);
 			}
 		});
 	})();
@@ -380,17 +374,6 @@
 	/* Array 原型方法扩展 */
 	(function() {
 		$.extend(Array.prototype, {
-			// 查找内容项位置
-			indexOf: function(item, it) {
-				for (var i = 0; i < this.length; i++) {
-					if (item == ((it) ? this[i][it] : this[i])) return i;
-				}
-				return -1;
-			},
-			// 删除指定内容项
-			remove: function(item, it) {
-				this.removeAt(this.indexOf(item, it));
-			},
 			// 删除指定内容项
 			removeAt: function(idx) {
 				if (idx >= 0 && idx < this.length) {
@@ -602,33 +585,16 @@
 	(function() {
 		// $.browser方法扩展
 		var ua = navigator.userAgent.toLowerCase();
-		if (!$.browser) {
-			$.browser = {
-				version: (ua.match( /.+(?:rv|it|ra|ie)[\/: ]([\d.]+)/ ) || [0,'0'])[1],
-				safari: /webkit/.test(ua),
-				opera: /opera/.test(ua),      
-				mozilla: /mozilla/.test(ua) && !/(compatible|webkit)/.test(ua)
-			};
-		}
-		// 增加了IE11的判断
-		$.browser.msie = (/msie/.test(ua)||/trident/.test(ua)) && !/opera/.test(ua);
+		if (!$.browser) $.browser = {};
 		$.extend($.browser, {
-			isIE6: ($.browser.msie && $.browser.version == 6) ? true: false,
-			IEMode: (function() {
-				if ($.browser.msie) {
-					// >=IE8
-					if (document.documentMode) {
-						return document.documentMode;
-					}
-					if (document.compatMode && document.compatMode == 'CSS1Compat') {
-						return 7;
-					}
-					// quirks mode
-					return 5;
-				}
-				return 0;
-			})(),
-			isIPad: (/iPad/i).test(navigator.userAgent),
+			mobile: (/phone|pad|pod|ios|android|mobile|blackberry|iemobile|mqqbrowser|juc|fennec|wosbrowser|browserng|webos|symbian|windows phone/i).test(ua),
+			PC: !this.mobile,
+			IOS: (/iphone|ipad|ipod/i).test(ua),
+			iPad: (/ipad/i).test(ua),
+			iPod: (/ipod/i).test(ua),
+			iPhone: (/iphone/i).test(ua),
+			Android: (/android/i).test(ua),
+			isWechat: (/micromessenger/i).test(ua),
 			language: function() {
 				return (navigator.language || navigator.userLanguage || '').toLowerCase();
 			}
@@ -636,7 +602,7 @@
 		// ----------------------------
 		// 获取tagName
 		$.fn.tagName = function() {
-			if (this.length === 0) return '';
+			if (!this.length) return '';
 			if (this.length > 1) {
 				var tagNames = [];
 				this.each(function(i, el) {
@@ -656,7 +622,11 @@
 		};
 		// 获取element属性的JSON值
 		$.fn.attrJSON = function(attr) {
-			return (this.attr(attr || 'rel') || '').parseAttrJSON();
+			return (this.attr(attr || 'data-opts') || '').parseAttrJSON();
+		};
+		// 生成随机数
+		$.randomInt = function(min, max) {
+			return Math.floor(Math.random() * (max - min + 1) + min);
 		};
 	})();
 
@@ -693,47 +663,7 @@
 			if (obj[item]) return;
 			obj[item] = value;
 			if (callback) callback();
-			MJJS.debug('MJJS.define', name, 'info');
 		};
-		// ----------------------------
-		// MJJS.debug 过程调试
-		MJJS.debug = function(a, b, type) {
-			if (!this.debugMode) return;
-			type = type || 'log';
-			if (window.console && console[type]) {
-				console[type](new Date().format('hh:nn:ss.S') + ', ' + a, ' = ', b);
-			} else {
-				MJJS.debug.log(new Date().format('hh:nn:ss.S') + ', ' + a + ' = ' + b);
-			}
-		};
-		$.extend(MJJS.debug, {
-			log: function() {
-				this.createDOM();
-				var p = [],
-					v = $('#_MJJS_debuglog textarea').val();
-				for (var i = 0; i < arguments.length; i++) {
-					p.push(arguments[i]);
-				}
-				v += (v === '' ? '': '\n') + p.join(' ');
-				$('#_MJJS_debuglog textarea').val(v);
-			},
-			clear: function() {
-				$('#_MJJS_debuglog textarea').val('');
-			},
-			createDOM: function() {
-				if ($('#_MJJS_debuglog').length === 0) {
-					var _html = '<div id="_MJJS_debuglog" style="position:fixed;bottom:0;left:0;right:0;_position:absolute;_bottom:auto;_top:0;padding:5px 0 5px 5px;border:solid 5px #666;background:#eee;z-index:1000;"><textarea style="font-size:12px;line-height:16px;display:block;background:#eee;border:none;width:100%;height:80px;"></textarea><a style="text-decoration:none;display:block;height:80px;width:20px;text-align:center;line-height:16px;padding:5px 0;_padding:6px 0;background:#666;color:#fff;position:absolute;right:-5px;bottom:0;" href="#">关闭调试器</a></div>';
-					$('body').append(_html);
-					$('#_MJJS_debuglog a').click(function() {
-						$(this).parent().remove();
-						return false;
-					});
-					$('#_MJJS_debuglog textarea').focus(function() {
-						this.select();
-					});
-				}
-			}
-		});
 		// ----------------------------
 		// MJJS.load/MJJS.loader 加载管理
 		MJJS.load = function(service, action, params) {
@@ -747,13 +677,11 @@
 					MJJS.loader.addExecute(url, action);
 				} else if (status === 0) {
 					MJJS.loader.addExecute(url, action);
-					MJJS.debug('开始加载JS', url);
 					MJJS.loader.fileLoader[url] = 1;
 					for (var i = 0; i < urlsize; i++) {
 						MJJS.load(service[i], function() {
 							MJJS.loader.fileLoader[url]++;
 							if (MJJS.loader.fileLoader[url] == urlsize + 1) {
-								MJJS.debug('完成加载JS', url);
 								MJJS.loader.execute(url);
 							}
 						});
@@ -807,8 +735,6 @@
 						MJJS.loader.addExecute(url, action);
 						MJJS.loader.addScript(service);
 					}
-				} else {
-					MJJS.debug('加载异常', service);
 				}
 			}
 		});
@@ -836,7 +762,7 @@
 				}
 			},
 			checkFileLoader: function(url) {
-				return (url !== '') ? (this.fileLoader[url] || 0) : -1;
+				return url !== ''? (this.fileLoader[url] || 0): -1;
 			},
 			getServiceUrl: function(service) {
 				var url = '';
@@ -865,7 +791,6 @@
 				if (this.checkFullUrl(service)) {
 					url = service;
 					this.getScript(url, function() {
-						MJJS.debug('完成加载JS', url);
 						this_.fileLoader[url] = 2;
 						MJJS.loader.execute(url);
 					});
@@ -873,7 +798,6 @@
 					if (this.serviceLibs[service].css) {
 						url = (this.checkFullUrl(this.serviceLibs[service].css)) ? this.serviceLibs[service].css: (this.serviceBase + this.serviceLibs[service].css);
 						if (!this.fileLoader[url]) {
-							MJJS.debug('开始加载CSS', url);
 							this.fileLoader[url] = 1;
 							$('head').append('<link rel="stylesheet" type="text\/css"  href="' + url + '" \/>');
 						}
@@ -881,7 +805,6 @@
 					if (this.serviceLibs[service].js) {
 						url = (this.checkFullUrl(this.serviceLibs[service].js)) ? this.serviceLibs[service].js: (this.serviceBase + this.serviceLibs[service].js);
 						this.getScript(url, function() {
-							MJJS.debug('完成加载JS', url);
 							this_.fileLoader[url] = 2;
 							MJJS.loader.execute(url);
 						});
@@ -889,7 +812,6 @@
 				}
 			},
 			getScript: function(url, onSuccess, onError) {
-				MJJS.debug('开始加载JS', url);
 				this.fileLoader[url] = 1;
 				this.getRemoteScript(url, onSuccess, onError);
 			},
@@ -1101,63 +1023,12 @@
 		});
 	})();
 
-	/* MJJS.util */
-	(function() {
-		// ----------------------------
-		MJJS.namespace('MJJS.util');
-		// ----------------------------
-	})();
-
 	/* MJJS.page */
 	(function() {
 		// ----------------------------
 		MJJS.namespace('MJJS.page');
 		// ----------------------------
 		$.extend(MJJS.page, {
-			// keyHandlers, such as: ESC
-			keyHandler: {
-				events: {},
-				keys: {
-					'ESC': 27,
-					'PAGEUP': 33,
-					'PAGEDOWN': 34,
-					'END': 35,
-					'HOME': 36,
-					'LEFT': 37,
-					'TOP': 38,
-					'RIGHT': 39,
-					'DOWN': 40,
-					'INSERT': 45,
-					'DELETE': 46,
-					'F1': 112,
-					'F2': 113,
-					'F3': 114,
-					'F4': 115,
-					'F5': 116,
-					'F6': 117,
-					'F7': 118,
-					'F8': 119,
-					'F9': 120,
-					'F10': 121,
-					'F11': 122,
-					'F12': 123
-				},
-				add: function(doc, key, eventItem, eventCallback) {
-					this.events[eventItem] = function(e) {
-						try {
-							var code = e.which || e.keyCode || 0;
-							if (code == MJJS.page.keyHandler.keys[key]) {
-								eventCallback();
-							}
-						} catch(err) {}
-					};
-					$(doc).bind('keydown', this.events[eventItem]);
-				},
-				remove: function(doc, eventItem) {
-					$(doc).unbind('keydown', this.events[eventItem]);
-					this.events[eventItem] = null;
-				}
-			},
 			// ------------------------
 			// 设置主域(用于不同二级域下的数据访问)
 			setDomain: function() {
@@ -1168,17 +1039,192 @@
 					d2 = k[k.length - 2],
 					d3 = k[k.length - 3];
 				document.domain = (d2 == 'com' || d2 == 'net') ? (d3 + '.' + d2 + '.' + d1) : (d2 + '.' + d1);
+			},
+			// 模块展开闭合
+			collapsible: function(switchBtn, time) {
+				if (switchBtn) {
+					$('#wrapper').on('click', switchBtn, function() {
+						var el = $(this).parents('.panel').eq(0).children('.panel-body');
+						var downClass = 'fa-chevron-down';
+						var upClass   = 'fa-chevron-up';
+						var time = time || 200;
+						if ($(this).hasClass(downClass)) {
+							$(this).removeClass(downClass).addClass(upClass);
+							el.stop().slideDown(time);
+						} else {
+							$(this).removeClass(upClass).addClass(downClass);
+							el.stop().slideUp(time);
+						}
+					});
+				}
+			},
+			// 模块删除
+			panelclose: function(btn) {
+				if (btn) {
+					$('#wrapper').on('click', btn, function() {
+						$(this).parents('.panel').eq(0).parent().remove();
+					});
+				}
+			},
+			// 列表删除
+			listclose: function(btn) {
+				if (btn) {
+					$('#wrapper').on('click', btn, function() {
+						$(this).closest('li').remove();
+					});
+				}
+			},
+			// 列表选择
+			listselect: function(btn) {
+				if (btn) {
+					$('#wrapper').on('click', btn, function () {
+						$(this).parents('li').eq(0).children('.todo-title').toggleClass('line-through');
+					});
+				}
+			},
+			// 列表导航
+			wizard: function(parent, opts) {
+				if (parent[0] !== '#') return;
+				MJJS.load(['wizard'], function() {
+					MJJS.page.custom.wizard(parent, opts);
+				});
 			}
 		});
+		MJJS.namespace('MJJS.page.dialog');
+		MJJS.namespace('MJJS.page.toaster');
 		$.extend(MJJS.page.dialog, {
+			show: function(type, obj) {
+				var obj = type === 'textarea'? obj: type;
+				if (typeof(obj)==='object') {
+					MJJS.load(['dialog'], function() {
+						var _obj = {
+							buttons: [{
+								label: obj.btn_1_name || '确定',
+								cssClass: 'btn-info',
+								action: function(o) {
+									typeof(obj.confirm)==='function' && obj.confirm(dialog);
+								}
+							}, {
+								label: obj.btn_2_name || '取消',
+								action: function() {
+									typeof(obj.cancel)==='function' && obj.cancel();
+									dialog.close();
+								}
+							}],
+							onshown: function() {
+								typeof(obj.load)==='function' && obj.load(dialog);
+							}
+						};
+						if (type === 'textarea') {
+							_obj.message = function (dialog) {
+								var $content = $('<textarea class="form-control" placeholder="'+(obj.placeholder || '')+'"></textarea>');
+								return $content;
+							};
+							_obj.buttons[0].hotkey = 13;
+						} else {
+							_obj.message = function (dialog) {
+								var $content = $(obj.message);
+								return $content;
+							};
+						}
+						if (obj.title) _obj.title = obj.title;
+						var dialog = new BootstrapDialog.show(_obj);
+					});
+				}
+			},
+			alert: function(text, callback) {
+				MJJS.load(['dialog'], function() {
+					if (typeof(text)==='string') {
+						BootstrapDialog.alert(text, function() {
+							if (typeof(callback)==='function') callback();
+						});
+					} else if (typeof(text)==='object') {
+						BootstrapDialog.confirm(text);
+					}
+				});
+			},
+			confirm: function(text, confirm, cancel) {
+				MJJS.load(['dialog'], function() {
+					if (typeof(text)==='string') {
+						BootstrapDialog.confirm(text, function(result) {
+							if (result) {
+								typeof(confirm)==='function' && confirm();
+							} else {
+								typeof(cancel)==='function' && cancel();
+							}
+						});
+					} else if (typeof(text)==='object') {
+						BootstrapDialog.confirm(text);
+					}
+				});
+			},
+			textarea: function(obj) {
+				this.show('textarea', obj);
+			}
+		});
+		$.extend(MJJS.page.toaster, {
+			init: function(type, message, opts) {
+				MJJS.load(['toaster'], function() {
+					var _opts = {
+						priority: type || 'success',
+						message: message
+					}
+					if (typeof(opts)==='object') {
+						opts.timeout = opts.timeout || 1500;
+						_opts.settings = opts;
+					} else {
+						_opts.settings = { timeout: 1500 };
+					}
+					$.toaster(_opts);
+				});
+			},
+			dark: function(message, opts) {
+				this.init('dark', message, opts);
+			},
+			success: function(message, opts) {
+				this.init('success', message, opts);
+			},
+			info: function(message, opts) {
+				this.init('info', message, opts);
+			},
+			warning: function(message, opts) {
+				this.init('warning', message, opts);
+			},
+			danger: function(message, opts) {
+				this.init('danger', message, opts);
+			}
 		});
 		// ----------------------------
 		// 页面初始化处理
 		MJJS.page.init = function() {
-			MJJS.debug('page', '开始初始化');
 		};
 		$(function() {
 			MJJS.page.init();
+		});
+	})();
+
+	/* MJJS.form */
+	(function() {
+		// ----------------------------
+		MJJS.namespace('MJJS.form');
+		// ----------------------------
+		$.extend(MJJS.form, {
+			// ------------------------
+			// 表单验证
+			validator: function(parent, opts) {
+				if (parent[0] !== '#' && $(parent).length === 1) return;
+				MJJS.load(['validator'], function() {
+					//MJJS.page.custom.wizard(parent, opts);
+					$(parent).bootstrapValidator(opts);
+				});
+			}
+		});
+		// ----------------------------
+		// 页面初始化处理
+		MJJS.form.init = function() {
+		};
+		$(function() {
+			MJJS.form.init();
 		});
 	})();
 
@@ -1213,19 +1259,23 @@
 			// 页面滚动条
 			nicescroll: {
 				init: function(parent, opts) {
-					MJJS.load(['nicescroll'], function() {
-						opts = opts || {
-							styler: 'fb',
-							cursorcolor: '#65cea7',
-							cursorwidth: '6',
-							cursorborderradius: '0px',
-							background: '#424f63',
-							spacebarenabled: false,
-							cursorborder: '0',
-							zindex: '1000'
-						};
-						if (parent) $(parent).niceScroll(opts);
-					});
+					if (parent) {
+						MJJS.load(['nicescroll'], function() {
+							var defOpts = {
+								styler: 'fb',
+								cursorcolor: '#65cea7',		// 滚动条颜色
+								cursorwidth: '6',			// 像素光标的宽度
+								cursorborder: '0',			// 游标边框css定义
+								cursorborderradius: '0',	// 以像素为光标边界半径
+								background: '#424f63',		// 滚动条背景色
+								spacebarenabled: false,
+								zindex: '1000'
+							}
+							MJJS.ui.optsEach(parent, opts, defOpts, function(e, _opts) {
+								$(parent).niceScroll(_opts);
+							});
+						});
+					}
 				},
 				hide: function(parent) {
 					MJJS.load(['nicescroll'], function() {
@@ -1250,63 +1300,22 @@
 					}
 				});
 			},
-			// 图表显示控件
-			raphael: function(type, opts) {
-				MJJS.load(['raphael'], function() {
-					if (Morris[type] && opts) Morris[type](opts);
-				});
-			},
-			// 生成线状图
-			sparkline: function(parent, data, opts) {
-				if (typeof(parent) === 'string') {
-					MJJS.load(['sparkline'], function() {
-						var defOpts = {
-							type: 'bar',
-							height: '35',
-							barWidth: 5,
-							barSpacing: 2,
-							barColor: '#65cea7'
-						}
-						MJJS.ui.optsEach(parent, opts, defOpts, function(e, _opts) {
-							$(e).sparkline(data, _opts);
-						});
-					});
-				}
-			},
-			// 饼图数据统计
-			easypiechart: function(parent, opts) {
-				if (typeof(parent) === 'string') {
-					MJJS.load(['easypiechart'], function() {
-						var defOpts = {
-							barColor: '#43886e',
-							trackColor: '#a3e2ca',
-							scaleLength: 0,
-							lineCap: 'round',
-							lineWidth: 5,
-							size: 85,
-							rotate: 0
-						}
-						MJJS.ui.optsEach(parent, opts, defOpts, function(e, _opts) {
-							$(e).easyPieChart(_opts);
-						});
-					});
-				}
-			},
-			// 柱状统计图
-			flot: function(parent, data, opts, callback) {
-				MJJS.load(['flot'], function() {
-					if (parent && typeof(callback)==='function') {
-						callback($.plot($(parent), data, opts));
-					}
-				});
-			},
 			// 表单美化
-			icheck: function(parent, cls) {
+			icheck: function(parent, color) {
 				MJJS.load(['icheck'], function() {
-					if (parent && cls) {
+					if (parent) {
+						var _color = 'square';
+						var col = {
+							red: true,
+							green: true,
+							blue: true,
+							yellow: true,
+							purple: true
+						}
+						if (color in col) _color = _color + '-' + color;
 						$(parent).iCheck({
-							checkboxClass: 'icheckbox_'+cls,
-							radioClass: 'iradio_'+cls,
+							checkboxClass: 'icheckbox_'+_color,
+							radioClass: 'iradio_'+_color,
 							increaseArea: '20%'
 						});
 					}
@@ -1322,9 +1331,12 @@
 			// iOS7样式开关
 			switchery: function(btn, opts) {
 				if (typeof(btn) === 'string') {
+					if (!opts) opts = {};
 					MJJS.load(['switchery'], function() {
 						MJJS.ui.optsEach(btn, opts, function(e, _opts) {
+							if ($(e).attr('data-switchery')) return;
 							var switchery = new Switchery(e, _opts);
+							if (typeof(_opts.load)==='function') _opts.load(switchery);
 							if (typeof(_opts.on)==='function' && typeof(_opts.off)==='function') {
 								$(e).on('change', function() {
 									var state = $(this)[0].checked;
@@ -1398,6 +1410,8 @@
 			// 输入标签
 			tagsinput: function(parent, opts) {
 				if (typeof(parent) === 'string') {
+					if (!opts) opts = { defaultText: '添加标签' };
+					opts.defaultText = opts.defaultText || '添加标签';
 					MJJS.load(['tagsinput'], function() {
 						MJJS.ui.optsEach(parent, opts, function(e, _opts) {
 							$(e).tagsInput(_opts);
@@ -1416,56 +1430,33 @@
 				});
 			},
 			// 日期时间选择器
-			timepicker: function(parent, opts, callback) {
+			timepicker: function(parent, opts) {
 				if (typeof(parent) === 'string') {
 					MJJS.load(['timepicker'], function() {
 						MJJS.ui.optsEach(parent, opts, function(e, _opts) {
+							if (_opts && _opts.initialDate) {
+								$(e).val(_opts.initialDate);
+							}
 							$(e).datetimepicker(_opts).on('changeDate', function(ev) {
-								if (typeof(_opts.callback)==='function') _opts.callback(ev, $(e));
+								if (_opts && typeof(_opts.callback)==='function') _opts.callback(ev, $(e));
 							});
 						});
 					});
 				}
 			},
-			// 模块展开闭合
-			collapsible: function(switchBtn, time) {
-				if (switchBtn) {
-					$('#wrapper').on('click', switchBtn, function() {
-						var el = $(this).parents('.panel').eq(0).children('.panel-body');
-						var downClass = 'fa-chevron-down';
-						var upClass   = 'fa-chevron-up';
-						var time = time || 200;
-						if ($(this).hasClass(downClass)) {
-							$(this).removeClass(downClass).addClass(upClass);
-							el.stop().slideDown(time);
-						} else {
-							$(this).removeClass(upClass).addClass(downClass);
-							el.stop().slideUp(time);
-						}
+			// 图表库
+			highcharts: function(parent, opts) {
+				if (typeof(parent)==='string'&&parent[0]==='#'&&$(parent).length===1&&opts) {
+					MJJS.load(['highcharts'], function() {
+						MJJS.ui.custom.highcharts(parent, opts);
 					});
 				}
 			},
-			// 模块删除
-			panelclose: function(btn) {
-				if (btn) {
-					$('#wrapper').on('click', btn, function() {
-						$(this).parents('.panel').eq(0).parent().remove();
-					});
-				}
-			},
-			// 列表删除
-			listclose: function(btn) {
-				if (btn) {
-					$('#wrapper').on('click', btn, function() {
-						$(this).closest('li').remove();
-					});
-				}
-			},
-			// 列表选择
-			listselect: function(btn) {
-				if (btn) {
-					$('#wrapper').on('click', btn, function () {
-						$(this).parents('li').eq(0).children('.todo-title').toggleClass('line-through');
+			// 地图
+			echarts: function(parent, opts) {
+				if (typeof(parent)==='string'&&parent[0]==='#'&&$(parent).length===1&&opts) {
+					MJJS.load(['echarts'], function() {
+						MJJS.ui.custom.echarts(parent, opts);
 					});
 				}
 			}
@@ -1473,7 +1464,6 @@
 		// ----------------------------
 		// 页面初始化处理
 		MJJS.ui.init = function() {
-			MJJS.debug('ui', '开始初始化');
 		};
 		$(function() {
 			MJJS.ui.init();
@@ -1540,7 +1530,6 @@
 					ga('send', 'pageview');
 				},
 				// 发送自定义数据
-				// hitType： pageview/event/social/timing
 				send: function(hitType, data) {
 					window.ga && ga('send', hitType, data);
 				},
@@ -1572,11 +1561,6 @@
 		// ----------------------------
 		MJJS.load.add('nicescroll',   { js: path+'jquery.nicescroll.js' });
 		MJJS.load.add('jqueryui',     { js: path+'jquery-ui/jquery-ui.min.js', css: path+'jquery-ui/jquery-ui.min.css' });
-		MJJS.load.add('morris',       { js: path+'morris-chart/morris.min.js', css: path+'morris-chart/morris.css' });
-		MJJS.load.add('raphael',      { js: path+'morris-chart/raphael-min.js', css: path+'morris-chart/morris.css', requires: 'morris' });
-		MJJS.load.add('sparkline',    { js: path+'sparkline/jquery.sparkline.min.js' });
-		MJJS.load.add('easypiechart', { js: path+'easypiechart/jquery.easypiechart.min.js' });
-		MJJS.load.add('flot',         { js: path+'flot-chart/jquery.flot.js' });
 		MJJS.load.add('icheck',       { js: path+'icheck/jquery.icheck.min.js', css: path+'icheck/skins/square/_all.css' });
 		MJJS.load.add('underscore',   { js: path+'underscore.min.js' });
 		MJJS.load.add('moment',       { js: path+'calendar/moment-2.2.1.min.js', requires: 'underscore' });
@@ -1592,13 +1576,22 @@
 		MJJS.load.add('DT',           { js: path+'data-tables/DT_bootstrap.js', css: path+'data-tables/DT_bootstrap.css', requires: 'datatable' });
 		MJJS.load.add('mj_datatable', { js: path+'custom/datatable.js', requires: 'DT' });
 		MJJS.load.add('timepicker',   { js: path+'bootstrap-datetimepicker/js/bootstrap-datetimepicker.js', css: path+'bootstrap-datetimepicker/css/datetimepicker-custom.css' });
+		MJJS.load.add('u-highcharts', { js: path+'highcharts.min.js' });
+		MJJS.load.add('highcharts',   { js: path+'custom/highcharts.js', requires: 'u-highcharts' });
+		MJJS.load.add('ui-echarts',   { js: path+'echarts/echarts.min.js' });
+		MJJS.load.add('echarts',      { js: path+'custom/echarts.js', requires: 'ui-echarts' });
+		MJJS.load.add('wizard',       { js: path+'custom/wizard.js' });
+		MJJS.load.add('dialog',       { js: path+'bootstrap-dialog/bootstrap-dialog.min.js', css: path+'bootstrap-dialog/bootstrap-dialog.min.css' });
+		MJJS.load.add('toaster',      { js: path+'jquery.toaster.js' });
+		MJJS.load.add('validator',    { js: path+'bootstrap-validator/bootstrap-validator.js', css: path+'bootstrap-validator/bootstrap-validator.css' });
 	})();
 
 	(function() {
 		MJJS.server = {
-			url:'mj.com'
+			url: 'mj.weimob.com',
+			api: '/mjad',
+			api_merge: '/mjad_merge'
 		}
-		MJJS.debug('MJJS.js','加载完成');
 	})();
 
 })(jQuery, window);
